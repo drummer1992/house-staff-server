@@ -1,0 +1,9 @@
+DROP TABLE "UsersWishProducts";
+DROP TABLE "CollectionsProducts";
+DROP TABLE "ProductsInventory";
+DROP TABLE "Collections";
+DROP TABLE "OrdersItems";
+DROP TABLE "Orders";
+DROP TABLE "Users";
+DROP TABLE "Products";
+DROP TABLE "Categories";
