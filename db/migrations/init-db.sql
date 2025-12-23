@@ -1,7 +1,8 @@
 CREATE TABLE "Categories"
 (
-    "id"   VARCHAR(36) PRIMARY KEY,
-    "name" VARCHAR(255) NOT NULL UNIQUE
+    "id"       VARCHAR(36) PRIMARY KEY,
+    "imageUrl" VARCHAR(255),
+    "name"     VARCHAR(255) NOT NULL UNIQUE
 );
 
 CREATE TABLE "Collections"
@@ -14,7 +15,7 @@ CREATE TABLE "Products"
 (
     "id"               VARCHAR(36) PRIMARY KEY,
     "name"             VARCHAR(255)   NOT NULL,
-    "categoryId"       VARCHAR(36)        NOT NULL REFERENCES "Categories" ("id"),
+    "categoryId"       VARCHAR(36)    NOT NULL REFERENCES "Categories" ("id"),
     "shortDescription" TEXT,
     "fullDescription"  TEXT,
     "price"            NUMERIC(10, 2) NOT NULL CHECK ("price" >= 0),
@@ -62,8 +63,8 @@ CREATE TABLE "Orders"
 
 CREATE TABLE "OrdersItems"
 (
-    "orderId"   VARCHAR(36)        NOT NULL REFERENCES "Orders" ("id") ON DELETE CASCADE,
-    "productId" VARCHAR(36)        NOT NULL REFERENCES "Products" ("id"),
+    "orderId"   VARCHAR(36)    NOT NULL REFERENCES "Orders" ("id") ON DELETE CASCADE,
+    "productId" VARCHAR(36)    NOT NULL REFERENCES "Products" ("id"),
     "quantity"  INTEGER        NOT NULL CHECK ("quantity" > 0),
     "price"     NUMERIC(10, 2) NOT NULL,
 
