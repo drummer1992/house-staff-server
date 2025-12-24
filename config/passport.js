@@ -6,6 +6,26 @@ import passport from 'passport'
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20'
 import knex from '../db/knex.js'
 import compact from 'lodash.compact'
+import { Strategy as JwtStrategy, ExtractJwt } from 'passport-jwt'
+
+const jwtOpts = {
+  jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+  secretOrKey   : process.env.JWT_SECRET,
+}
+
+const jwtStrategy = new JwtStrategy(jwtOpts, async (jwtPayload, done) => {
+  try {
+    const [user] = await knex.client.select('*').from('Users')
+      .where({ id: jwtPayload.id })
+
+    if (user) return done(null, user)
+    return done(null, false)
+  } catch (err) {
+    return done(err, false)
+  }
+})
+
+passport.use(jwtStrategy)
 
 passport.use(
   new GoogleStrategy(
@@ -23,9 +43,11 @@ passport.use(
           name : compact([profile.displayName, profile.name.givenName, profile.name.familyName]).join(' '),
         }
 
-        const userExists = await knex.client.count().from('Users').where({ id: profile.id })
+        const { count } = await knex.client.count()
+          .from('Users').where({ id: profile.id })
+          .first()
 
-        if (!userExists) {
+        if (!Number(count)) {
           await knex.client.insert(user).into('Users')
         }
 

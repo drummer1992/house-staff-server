@@ -41,18 +41,18 @@ authRouter.get('/failure', (req, res) => {
  * GET /auth/user
  * Get current authenticated user
  */
-authRouter.get('/user', async (req, res) => {
-  if (req.isAuthenticated()) {
-    res.json({
-      user: req.user,
-    })
-  } else {
-    res.status(401).json({
-      authenticated: false,
-      message      : 'Not authenticated',
-    })
-  }
-})
+authRouter.get('/user',
+  passport.authenticate('jwt', { session: false }),
+  async (req, res) => {
+    if (req.isAuthenticated()) {
+      res.json(req.user)
+    } else {
+      res.status(401).json({
+        authenticated: false,
+        message      : 'Not authenticated',
+      })
+    }
+  })
 
 /**
  * GET /auth/logout
