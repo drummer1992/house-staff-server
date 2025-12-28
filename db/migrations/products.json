@@ -70,6 +70,7 @@
   {
     "name": "White Chair",
     "category": "Chairs",
+    "collection": "Bedroom Collection",
     "price": 400,
     "discount": 10,
     "releaseDate": "2025-09-09",
@@ -84,6 +85,7 @@
   {
     "name": "Bed",
     "category": "Beds",
+    "collection": "Bedroom Collection",
     "price": 900,
     "discount": 10,
     "releaseDate": "2025-09-09",

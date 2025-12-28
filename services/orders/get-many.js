@@ -10,7 +10,7 @@ export default async ({ ordersIds, user } = {}) => {
     .where({ userId: user.id })
     .modify(qb => {
       if (ordersIds) {
-        qb.whereIn('id', ordersIds);
+        qb.whereIn('id', ordersIds)
       }
     })
 
@@ -30,7 +30,6 @@ export default async ({ ordersIds, user } = {}) => {
   const productsMap = keyBy(products, 'id')
 
   return orders.map(order => {
-
     return {
       id       : order.id,
       createdAt: order.createdAt,
