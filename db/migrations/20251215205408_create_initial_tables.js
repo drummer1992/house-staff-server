@@ -58,6 +58,51 @@ export const up = async function(knex) {
     collectionId: collectionsMap[p.collection].id,
   }))).into('CollectionsProducts')
 
+  const presentationsData = {
+    ['Living Room Collection']: {
+      imageUrl: 'https://i.ibb.co/pjQnvHVD/living-room.webp',
+      hotspots: [
+        { top: '60%', left: '50%', productId: '938ba3c3-29ac-425f-862a-1cd8d37eee21' },//Arm Chair
+        { top: '80%', left: '15%', productId: '015be44d-e01f-42f3-a102-3421df3685fe' },//Slipcovered Sofa
+        { top: '77%', left: '50%', productId: '8b1a569d-906d-425b-8d82-e0003dc5fa9c' },//Coffe Table
+      ],
+    },
+
+    ['Dining Room Collection']: {
+      imageUrl: 'https://i.ibb.co/9k92dK8X/dining-room.webp',
+      hotspots: [
+        { top: '70%', left: '35%', productId: '30fa737c-1694-463d-8150-fc9b114f19b8' },//Salon Chair
+        { top: '73%', left: '20%', productId: '912a7a36-8ffc-4234-85eb-d3cd832472df' },//Dining Table
+      ],
+    },
+
+    ['Bedroom Collection']: {
+      img     : 'https://i.ibb.co/KpS8nvk2/bedroom-collection.webp',
+      hotspots: [
+        { top: '38%', left: '42%', productId: 'e61bed4a-ae36-431f-8d2a-ba56cb239e49' },//white chair
+        { top: '62%', left: '15%', productId: '159a0f49-512a-4fb5-a4b6-509e729c711f' },//bed
+        { top: '46%', left: '65%', productId: '683b8cce-aa04-4f08-b37a-63a53212f37f' },//gravity floor lamp
+      ],
+    },
+
+    ['Home Collection']: {
+      img     : 'https://i.ibb.co/bMvXPJLh/home-collection.webp',
+      hotspots: [
+        { top: '64%', left: '42%', productId: 'ed05be3e-5d2b-4256-a30f-6a06178d2a9a' },//Barnen Dining Chair
+        { top: '89%', left: '20%', productId: '2a0cb6bc-4bd3-4f4e-82d1-ddeb40b65643' },//Arun Slipcovered Sofa
+        { top: '87%', left: '53%', productId: '64e90c93-12b2-4994-9124-f2eb6594353f' },//Marble Coffee Table
+      ],
+    },
+  }
+
+  for (const collectionName in presentationsData) {
+    const presentation = presentationsData[collectionName]
+
+    await knex.update({ presentation: JSON.stringify(presentation) })
+      .where({ name: collectionName })
+      .from('Collections')
+  }
+
   console.log('Initial tables created')
 }
 

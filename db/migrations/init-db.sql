@@ -7,8 +7,9 @@ CREATE TABLE "Categories"
 
 CREATE TABLE "Collections"
 (
-    "id"   VARCHAR(36) PRIMARY KEY,
-    "name" VARCHAR(255) NOT NULL UNIQUE
+    "id"           VARCHAR(36) PRIMARY KEY,
+    "name"         VARCHAR(255) NOT NULL UNIQUE,
+    "presentation" JSONB
 );
 
 CREATE TABLE "Products"
