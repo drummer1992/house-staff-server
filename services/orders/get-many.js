@@ -3,12 +3,16 @@ import knex from '../../db/knex.js'
 import groupBy from 'lodash.groupby'
 import keyBy from 'lodash.keyby'
 
-export default async (ordersIds, user) => {
+export default async ({ ordersIds, user } = {}) => {
   assert(user, 'User must be provided')
 
   const orders = await knex.client('Orders').select('*')
     .where({ userId: user.id })
-    .whereIn('id', ordersIds)
+    .modify(qb => {
+      if (ordersIds) {
+        qb.whereIn('id', ordersIds);
+      }
+    })
 
   const ordersItems = orders.length
     ? await knex.client('OrdersItems').select('*')

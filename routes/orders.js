@@ -13,9 +13,17 @@ ordersRouter.post('/', endpointHandler(async req => {
 
   const orderId = await createOrder(req.body, user)
 
-  const [order] = await getOrders([orderId], user)
+  const [order] = await getOrders({ ordersIds: [orderId], user })
 
   return order
+}))
+
+ordersRouter.get('/', endpointHandler(async () => {
+  assertUserAuthenticated()
+
+  const user = getCurrentUser()
+
+  return getOrders({ user })
 }))
 
 export default ordersRouter
