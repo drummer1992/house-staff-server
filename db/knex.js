@@ -4,6 +4,19 @@ import assert from 'assert'
 import logger from '../utils/logger.js'
 import * as timing from '../utils/timing.js'
 import { randomCode } from '../utils/random.js'
+import pg from 'pg'
+
+pg.types.setTypeParser(pg.types.builtins.INT8, (value) => {
+  return parseInt(value)
+})
+
+pg.types.setTypeParser(pg.types.builtins.FLOAT8, (value) => {
+  return parseFloat(value)
+})
+
+pg.types.setTypeParser(pg.types.builtins.NUMERIC, (value) => {
+  return parseFloat(value)
+})
 
 const logQuery = queryData => {
   queryData.options = queryData.options || {}

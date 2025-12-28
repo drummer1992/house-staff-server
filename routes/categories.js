@@ -1,10 +1,9 @@
 import express from 'express'
 import getCategories from '../services/categories/get-all.js'
+import endpointHandler from '../config/endpoint-handler.js'
 
 const categoriesRouter = express.Router()
 
-categoriesRouter.get('/', async (req, res) => {
-  res.json(await getCategories())
-})
+categoriesRouter.get('/', endpointHandler(() => getCategories()))
 
 export default categoriesRouter

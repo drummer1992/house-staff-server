@@ -54,27 +54,43 @@ CREATE TABLE "Users"
 
 CREATE TABLE "Orders"
 (
-    "id"         VARCHAR(36) PRIMARY KEY,
-    "userId"     VARCHAR(36) REFERENCES "Users" ("id"),
-    "totalPrice" NUMERIC(10, 2) NOT NULL CHECK ("totalPrice" >= 0),
-    "createdAt"  TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    "status"     VARCHAR(50)              DEFAULT 'New'
+    "id"                 VARCHAR(36) PRIMARY KEY,
+    "userId"             VARCHAR(36) REFERENCES "Users" ("id"),
+    "totalPrice"         NUMERIC(10, 2) NOT NULL CHECK ("totalPrice" >= 0),
+    "createdAt"          TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    "status"             VARCHAR(50)              DEFAULT 'pending',
+    "notes"              TEXT,
+    "deliveryMethod"     VARCHAR(50)    NOT NULL,
+    "deliveryPrice"      NUMERIC(10, 2) NOT NULL  DEFAULT 0 CHECK ("deliveryPrice" >= 0),
+    "paymentMethod"      VARCHAR(50)              DEFAULT 'cash',
+
+    "receiverAddress"    VARCHAR(255),
+    "receiverCity"       VARCHAR(255),
+    "receiverCountry"    VARCHAR(255),
+    "receiverPostalCode" VARCHAR(255),
+    "receiverCompany"    VARCHAR(100),
+    "receiverEmail"      VARCHAR(100),
+    "receiverPhone"      VARCHAR(20),
+    "vat"                NUMERIC(10, 2) NOT NULL  DEFAULT 0 CHECK ("vat" >= 0)
 );
 
 CREATE TABLE "OrdersItems"
 (
+    "id"        VARCHAR(36) PRIMARY KEY,
     "orderId"   VARCHAR(36)    NOT NULL REFERENCES "Orders" ("id") ON DELETE CASCADE,
     "productId" VARCHAR(36)    NOT NULL REFERENCES "Products" ("id"),
     "quantity"  INTEGER        NOT NULL CHECK ("quantity" > 0),
     "price"     NUMERIC(10, 2) NOT NULL,
+    "discount"  NUMERIC(5, 2) DEFAULT 0 CHECK ("discount" >= 0 AND "discount" <= 100),
 
-    PRIMARY KEY ("orderId", "productId")
+    UNIQUE ("orderId", "productId")
 );
 
 CREATE TABLE "UsersWishProducts"
 (
+    "id"        VARCHAR(36) PRIMARY KEY,
     "userId"    VARCHAR(36) NOT NULL REFERENCES "Users" ("id") ON DELETE CASCADE,
     "productId" VARCHAR(36) NOT NULL REFERENCES "Products" ("id") ON DELETE CASCADE,
 
-    PRIMARY KEY ("userId", "productId")
+    UNIQUE ("userId", "productId")
 );

@@ -2,9 +2,11 @@ import dotenv from 'dotenv'
 
 dotenv.config()
 
-import('./assert-env-fulfilled.js')
+import('./config/assert-env-fulfilled.js')
+import './config/init-sito.js'
 
 import express from 'express'
+import 'express-async-errors'
 import cors from 'cors'
 import session from 'express-session'
 import passport from './config/passport.js'
@@ -16,6 +18,13 @@ import { asyncStorage } from './utils/async-storage.js'
 import { randomCode } from './utils/random.js'
 import categoriesRouter from './routes/categories.js'
 import collectionsRouter from './routes/collections.js'
+import { NotFoundError } from './errors/index.js'
+import errorHandler from './config/error-handler.js'
+import endpointHandler from './config/endpoint-handler.js'
+import userRouter from './routes/user.js'
+import optionsRouter from './routes/options.js'
+import ordersRouter from './routes/orders.js'
+import auth from './config/auth.js'
 
 const app = express()
 
@@ -35,7 +44,6 @@ app.use(session({
   resave           : false,
   saveUninitialized: false,
   cookie           : {
-    secure  : process.env.NODE_ENV === 'production',
     httpOnly: true,
     maxAge  : DAY,
   },
@@ -50,29 +58,26 @@ app.use((req, res, next) => {
   next()
 })
 
-// Health check endpoint
-app.get('/health', (req, res) => {
-  res.json({
-    status   : 'ok',
-    timestamp: new Date().toISOString(),
-    service  : 'house-staff-server',
-  })
-})
+app.use(auth)
+
+app.get('/health', endpointHandler(() => ({
+  status   : 'ok',
+  timestamp: new Date().toISOString(),
+})))
 
 app.use('/auth', authRoutes)
+app.use('/user', userRouter)
+app.use('/orders', ordersRouter)
 app.use('/products', productsRoutes)
 app.use('/categories', categoriesRouter)
 app.use('/collections', collectionsRouter)
+app.use('/options', optionsRouter)
 
-app.use((req, res) => {
-  res.status(404).json({ error: 'Route not found' })
+app.use(() => {
+  throw new NotFoundError('Route not found')
 })
 
-app.use((err, req, res) => {
-  logger.error('Error:', err)
-
-  res.status(err.status).json({ error: err.message })
-})
+app.use(errorHandler)
 
 app.listen(process.env.PORT, () => {
   logger.info(`🚀 Server running on http://localhost:${process.env.PORT}`)

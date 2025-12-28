@@ -1,10 +1,9 @@
 import express from 'express'
 import getCollections from '../services/collections/get-all.js'
+import endpointHandler from '../config/endpoint-handler.js'
 
 const collectionsRouter = express.Router()
 
-collectionsRouter.get('/', async (req, res) => {
-  res.json(await getCollections())
-})
+collectionsRouter.get('/', endpointHandler(() => getCollections()))
 
 export default collectionsRouter
