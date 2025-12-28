@@ -5,6 +5,8 @@ import { validationAssert } from '../../../errors/index.js'
 const removeProduct = async (productId, user) => {
   assert(user, 'User must be provided')
 
+  validationAssert(productId, 'Product ID must be provided')
+
   const { count: productExists } = await knex.client('Products').count()
     .where({ id: productId })
     .first()
