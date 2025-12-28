@@ -60,7 +60,7 @@ export const up = async function(knex) {
 
   const presentationsData = {
     ['Living Room Collection']: {
-      imageUrl: 'https://i.ibb.co/pjQnvHVD/living-room.webp',
+      imageUrl: 'https://i.ibb.co/YBXb75n9/living-room.webp',
       hotspots: [
         { top: '60%', left: '50%', productId: '938ba3c3-29ac-425f-862a-1cd8d37eee21' },
         { top: '80%', left: '15%', productId: '015be44d-e01f-42f3-a102-3421df3685fe' },
@@ -86,7 +86,7 @@ export const up = async function(knex) {
     },
 
     ['Home Collection']: {
-      imageUrl     : 'https://i.ibb.co/bMvXPJLh/home-collection.webp',
+      imageUrl     : 'https://i.ibb.co/G4MR0Tkw/home-collection.webp',
       hotspots: [
         { top: '64%', left: '42%', productId: 'ed05be3e-5d2b-4256-a30f-6a06178d2a9a' },
         { top: '89%', left: '20%', productId: '2a0cb6bc-4bd3-4f4e-82d1-ddeb40b65643' },

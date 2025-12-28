@@ -4,7 +4,6 @@ dotenv.config()
 
 import('./config/assert-env-fulfilled.js')
 import './config/init-sito.js'
-
 import express from 'express'
 import 'express-async-errors'
 import cors from 'cors'
