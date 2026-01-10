@@ -26,10 +26,9 @@ const validationSchema = object({
       street    : string().notEmpty().required(),
     }).required().strict(),
 
-    company: string().notEmpty().required(),
-    email  : string().notEmpty().required(),
-    phone  : string().notEmpty().required(),
-    notes  : string().notEmpty().required(),
+    email: string().notEmpty().required(),
+    phone: string().notEmpty().required(),
+    notes: string().notEmpty(),
   }).required().strict(),
 
   items: array(
@@ -127,7 +126,6 @@ export default async (order, user) => {
     receiverCity      : order.shippingDetails.address.city,
     receiverCountry   : order.shippingDetails.address.country,
     receiverPostalCode: order.shippingDetails.address.postalCode,
-    receiverCompany   : order.shippingDetails.company,
     receiverEmail     : order.shippingDetails.email,
     receiverPhone     : order.shippingDetails.phone,
     vat,

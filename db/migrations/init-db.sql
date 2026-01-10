@@ -69,7 +69,6 @@ CREATE TABLE "Orders"
     "receiverCity"       VARCHAR(255),
     "receiverCountry"    VARCHAR(255),
     "receiverPostalCode" VARCHAR(255),
-    "receiverCompany"    VARCHAR(100),
     "receiverEmail"      VARCHAR(100),
     "receiverPhone"      VARCHAR(20),
     "vat"                NUMERIC(10, 2) NOT NULL  DEFAULT 0 CHECK ("vat" >= 0)

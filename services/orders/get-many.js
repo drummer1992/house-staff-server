@@ -53,10 +53,9 @@ export default async ({ ordersIds, user } = {}) => {
           street    : order.receiverAddress,
         },
 
-        company: order.receiverCompany,
-        email  : order.receiverEmail,
-        phone  : order.receiverPhone,
-        notes  : order.notes,
+        email: order.receiverEmail,
+        phone: order.receiverPhone,
+        notes: order.notes,
       },
 
       items: ordersItemsGrouped[order.id].map(item => ({
