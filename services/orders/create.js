@@ -8,6 +8,7 @@ import { validationAssert } from '../../errors/index.js'
 import keyBy from 'lodash.keyby'
 import sumBy from 'lodash.sumby'
 import countries from '../../constants/countries.js'
+import { roundMoney } from '../../utils/number.js'
 
 const validationSchema = object({
   delivery: object({ method: oneOf(deliveryMethods.map(m => m.id)).required() })
@@ -80,11 +81,11 @@ const calculatePrice = (productsMap, order) => {
 
   const countryVatRate = country.vatRate
 
-  const subtotalPrice = productsPrice + deliveryPrice
+  const subtotalPrice = roundMoney(productsPrice + deliveryPrice)
 
-  const vat = (subtotalPrice * countryVatRate / 100)
+  const vat = roundMoney(subtotalPrice * countryVatRate / 100)
 
-  const totalPrice = subtotalPrice + vat
+  const totalPrice = roundMoney(subtotalPrice + vat)
 
   return { deliveryPrice, totalPrice, vat }
 }
