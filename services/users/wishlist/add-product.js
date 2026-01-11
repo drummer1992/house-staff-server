@@ -1,6 +1,7 @@
 import assert from 'assert'
 import knex from '../../../db/knex.js'
 import { validationAssert } from '../../../errors/index.js'
+import { uuidV4 } from '../../../utils/random.js'
 
 const addProduct = async (productId, user) => {
   assert(user, 'User must be provided')
@@ -19,7 +20,7 @@ const addProduct = async (productId, user) => {
 
   validationAssert(!wishItemExists, 'Product is already in wishlist')
 
-  await knex.client('UsersWishProducts').insert({ productId: productId, userId: user.id })
+  await knex.client('UsersWishProducts').insert({ id: uuidV4(), productId: productId, userId: user.id })
 }
 
 export default addProduct
