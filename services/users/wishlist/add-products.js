@@ -19,7 +19,7 @@ const addProducts = async (productsIds, user) => {
 
   const notFoundProductsIds = productsIds.filter(id => !products.find(p => p.id === id))
 
-  validationAssert(notFoundProductsIds.length, 'Some products were not found: ' + notFoundProductsIds.join(', '))
+  validationAssert(!notFoundProductsIds.length, 'Some products were not found: ' + notFoundProductsIds.join(', '))
 
   const alreadyWishlisted = await knex.client('UsersWishProducts')
     .select(['productId'])
