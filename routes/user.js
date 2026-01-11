@@ -2,7 +2,7 @@ import express from 'express'
 import endpointHandler from '../config/endpoint-handler.js'
 import { assertUserAuthenticated, getCurrentUser } from '../config/auth.js'
 import getWishlist from '../services/users/wishlist/get.js'
-import addProduct from '../services/users/wishlist/add-product.js'
+import addProducts from '../services/users/wishlist/add-products.js'
 import removeProduct from '../services/users/wishlist/remove-product.js'
 import updateUser from '../services/users/update.js'
 
@@ -26,10 +26,10 @@ userRouter.get('/wishlist', endpointHandler(() => {
   return getWishlist(getCurrentUser())
 }))
 
-userRouter.post('/wishlist/add-product', endpointHandler(req => {
+userRouter.post('/wishlist/add-products', endpointHandler(req => {
   assertUserAuthenticated()
 
-  return addProduct(req.body.productId, getCurrentUser())
+  return addProducts(req.body.productsIds, getCurrentUser())
 }))
 
 userRouter.delete('/wishlist/remove-product', endpointHandler(req => {
