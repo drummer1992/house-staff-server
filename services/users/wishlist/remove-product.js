@@ -13,7 +13,7 @@ const removeProduct = async (productId, user) => {
 
   validationAssert(productExists, 'Such a product does not exist')
 
-  const { wishItemExists } = await knex.client('UsersWishProducts').count()
+  const { count: wishItemExists } = await knex.client('UsersWishProducts').count()
     .where({ productId: productId, userId: user.id })
     .first()
 
