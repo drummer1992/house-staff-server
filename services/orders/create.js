@@ -109,7 +109,11 @@ export default async (order, user) => {
 
   const { deliveryPrice, totalPrice, vat } = calculatePrice(productsMap, order)
 
-  validationAssert(totalPrice === order.totalPrice, 'Total price does not match the sum of item prices')
+  validationAssert(totalPrice === order.totalPrice,
+    'Total price does not match the sum of item prices. ' +
+    `Provided total: ${order.totalPrice} Expected total: ${totalPrice}. ` +
+    `Expected delivery price: ${deliveryPrice}, Expected VAT: ${vat}`
+  )
 
   await updateProductsStock(order.items)
 
