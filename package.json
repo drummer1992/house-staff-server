@@ -8,7 +8,15 @@
     "dev": "npm run db:init && node --watch index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "db:init": "npx knex migrate:latest --knexfile knexfile.js",
-    "db:down": "npx knex migrate:down --knexfile knexfile.js"
+    "db:down": "npx knex migrate:down --knexfile knexfile.js",
+    "docker:run-staging": "docker run --env-file .env --name hss -p 3000:3000 -v $(pwd):/app house-staff-server:$(git rev-parse --short HEAD)",
+    "docker:build-staging": "docker build --target=dev -t house-staff-server:$(git rev-parse --short HEAD) -t house-staff-server:latest .",
+    "docker:stop-staging": "docker stop hss",
+    "docker:remove-staging": "docker rm -f hss && docker rmi house-staff-server:$(git rev-parse --short HEAD)",
+    "docker:compose-up-dev": "IMAGE_TAG=$(git rev-parse --short HEAD) docker-compose -f docker-compose.dev.yml up --build",
+    "docker:compose-down-dev": "docker compose -f docker-compose.dev.yml down",
+    "docker:compose-up-prod": "IMAGE_TAG=$(git rev-parse --short HEAD) docker-compose -f docker-compose.prod.yml up --build",
+    "docker:compose-down-prod": "docker compose -f docker-compose.prod.yml down"
   },
   "keywords": [],
   "author": "",

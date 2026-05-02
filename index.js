@@ -1,8 +1,4 @@
-import dotenv from 'dotenv'
-
-dotenv.config()
-
-import('./config/assert-env-fulfilled.js')
+await import('./config/init-env.js')
 import './config/init-sito.js'
 import express from 'express'
 import 'express-async-errors'
@@ -81,6 +77,8 @@ app.use(errorHandler)
 app.listen(process.env.PORT, () => {
   logger.info(`🚀 Server running on http://localhost:${process.env.PORT}`)
   logger.info(`📝 Environment: ${process.env.NODE_ENV}`)
+
+  logger.info('Press Ctrl+C to stop the server')
 })
 
 export default app
