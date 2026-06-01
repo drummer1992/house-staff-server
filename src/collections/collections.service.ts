@@ -1,12 +1,12 @@
-import { Inject, Injectable } from '@nestjs/common'
-import type { Knex } from 'knex'
-import { KNEX } from '../database/knex.constants.js'
+import { Injectable } from '@nestjs/common'
+import { CollectionsRepository } from './collections.repository.js'
 
 @Injectable()
 export class CollectionsService {
-  constructor(@Inject(KNEX) private readonly knex: Knex) {}
+  constructor(private readonly collections: CollectionsRepository) {
+  }
 
   findAll() {
-    return this.knex.select('*').from('Collections')
+    return this.collections.findAll()
   }
 }

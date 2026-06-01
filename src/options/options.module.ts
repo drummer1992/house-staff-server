@@ -4,6 +4,7 @@ import { OptionsService } from './options.service.js'
 
 @Module({
   controllers: [OptionsController],
-  providers: [OptionsService],
+  providers  : [OptionsService],
 })
-export class OptionsModule {}
+export class OptionsModule {
+}

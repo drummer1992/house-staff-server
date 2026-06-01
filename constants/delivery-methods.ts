@@ -2,18 +2,18 @@ import type { DeliveryMethod } from '../types/domain.js'
 
 const deliveryMethods: DeliveryMethod[] = [
   {
-    id: 'free',
-    name: 'Free Shipping',
+    id   : 'free',
+    name : 'Free Shipping',
     price: 0,
   },
   {
-    id: 'flat',
-    name: 'Flat Rate',
+    id   : 'flat',
+    name : 'Flat Rate',
     price: 10,
   },
   {
-    id: 'pickup',
-    name: 'Local Pickup',
+    id   : 'pickup',
+    name : 'Local Pickup',
     price: 10,
   },
 ]

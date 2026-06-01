@@ -15,7 +15,7 @@ import { HealthModule } from './health/health.module.js'
 import { ApiErrorFilter } from './common/api-error.filter.js'
 
 @Module({
-  imports: [
+  imports  : [
     AppConfigModule,
     DatabaseModule,
     LoggerModule,
@@ -30,9 +30,8 @@ import { ApiErrorFilter } from './common/api-error.filter.js'
     HealthModule,
   ],
   providers: [
-    // Global filter mapping legacy ApiError classes (thrown by reused services)
-    // to HTTP responses.
     { provide: APP_FILTER, useClass: ApiErrorFilter },
   ],
 })
-export class AppModule {}
+export class AppModule {
+}

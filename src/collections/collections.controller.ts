@@ -3,7 +3,8 @@ import { CollectionsService } from './collections.service.js'
 
 @Controller('collections')
 export class CollectionsController {
-  constructor(private readonly collections: CollectionsService) {}
+  constructor(private readonly collections: CollectionsService) {
+  }
 
   @Get()
   findAll() {

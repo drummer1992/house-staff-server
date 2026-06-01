@@ -3,7 +3,8 @@ import { ProductsService } from './products.service.js'
 
 @Controller('products')
 export class ProductsController {
-  constructor(private readonly products: ProductsService) {}
+  constructor(private readonly products: ProductsService) {
+  }
 
   @Get()
   findAll() {

@@ -3,7 +3,8 @@ import { OptionsService } from './options.service.js'
 
 @Controller('options')
 export class OptionsController {
-  constructor(private readonly options: OptionsService) {}
+  constructor(private readonly options: OptionsService) {
+  }
 
   @Get()
   getAll() {

@@ -5,7 +5,7 @@ const withBrackets = (value: string) => `[${value}]`
 
 const REQ_ID = Symbol('rid')
 
-type LogLevel = 'info' | 'error'
+type LogLevel = 'error' | 'log' | 'warn'
 
 class Logger {
   private [REQ_ID]?: string
@@ -19,13 +19,13 @@ class Logger {
   }
 
   print(level: LogLevel, args: unknown[]): void {
-    console[level](compact([this.reqId && withBrackets(this.reqId), ...args]).join(' '))
+    console[level](compact([new Date(), this.reqId && withBrackets(this.reqId), ...args]).join(' '))
   }
 }
 
 const DEFAULT_LOGGER = new Logger()
 
-const getLogger = (): Logger => {
+export const getLogger = (): Logger => {
   const store = asyncStorage.getStore()
 
   if (!store) {
@@ -42,14 +42,3 @@ const getLogger = (): Logger => {
 
   return logger
 }
-
-const logger = {
-  info(...args: unknown[]): void {
-    return getLogger().print('info', args)
-  },
-  error(...args: unknown[]): void {
-    return getLogger().print('error', args)
-  },
-}
-
-export default logger

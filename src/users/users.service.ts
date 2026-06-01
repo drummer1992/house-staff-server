@@ -1,26 +1,37 @@
 import { Injectable } from '@nestjs/common'
+import compact from 'lodash.compact'
 import type { Profile } from 'passport-google-oauth20'
-import getUserById from '../../services/users/get-by-id.js'
-import upsertUser from '../../services/users/upsert.js'
-import updateUser from '../../services/users/update.js'
+import { UsersRepository } from './users.repository.js'
 import type { User } from '../../types/domain.js'
 
-/**
- * Thin wrapper around the existing user services. Delegates for now so there is
- * a single implementation; the Users domain absorbs this logic when it is
- * migrated in Phase 4.
- */
 @Injectable()
 export class UsersService {
+  constructor(private readonly users: UsersRepository) {
+  }
+
   getById(id: string): Promise<User | undefined> {
-    return getUserById(id)
+    return this.users.findById(id)
   }
 
-  upsertFromProfile(profile: Profile): Promise<User> {
-    return upsertUser(profile)
+  async upsertFromProfile(profile: Profile): Promise<User> {
+    const user: User = {
+      id   : profile.id,
+      email: profile.emails?.[0]?.value ?? '',
+      name : compact([profile.displayName, profile.name?.givenName, profile.name?.familyName]).join(' '),
+    }
+
+    const exists = await this.users.countById(profile.id)
+
+    if (!exists) {
+      await this.users.insert(user)
+    }
+
+    return user
   }
 
-  update(changes: Partial<User>, user: User): Promise<User> {
-    return updateUser(changes, user)
+  async update(changes: Partial<User>, user: User): Promise<User | undefined> {
+    await this.users.update(user.id, changes)
+
+    return this.users.findById(user.id)
   }
 }

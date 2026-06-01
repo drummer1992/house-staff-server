@@ -3,24 +3,23 @@
     "target": "ES2022",
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
-    "lib": ["ES2022"],
-
+    "lib": [
+      "ES2022"
+    ],
     "outDir": "./dist",
     "rootDir": "./",
-
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
-
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-
     "sourceMap": true,
     "declaration": false,
-
-    "types": ["node"]
+    "types": [
+      "node"
+    ]
   },
   "include": [
     "knexfile.ts",
@@ -33,5 +32,8 @@
     "services/**/*.ts",
     "utils/**/*.ts"
   ],
-  "exclude": ["node_modules", "dist"]
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
 }

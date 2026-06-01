@@ -11,16 +11,15 @@ export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly config: ConfigService,
-  ) {}
+  ) {
+  }
 
-  /** Initiates the Google OAuth login flow (guard performs the redirect). */
   @Get('google')
   @UseGuards(GoogleOAuthGuard)
   googleAuth() {
-    // The GoogleOAuthGuard redirects to Google; this body is never reached.
+    // the guard kicks off the Google redirect, nothing to do here
   }
 
-  /** Google OAuth callback — issues a JWT and redirects back to the frontend. */
   @Get('google/callback')
   @UseGuards(GoogleOAuthGuard)
   googleCallback(@User() user: DomainUser, @Res() res: Response) {

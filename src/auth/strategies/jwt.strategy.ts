@@ -5,17 +5,12 @@ import { ExtractJwt, Strategy } from 'passport-jwt'
 import { UsersService } from '../../users/users.service.js'
 import type { User } from '../../../types/domain.js'
 
-/**
- * Registers under the default 'jwt' name on the shared passport singleton.
- * Behaviour mirrors the legacy JWT strategy: same secret, same user lookup,
- * returns the user on success or a falsy value (→ unauthenticated) otherwise.
- */
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(config: ConfigService, private readonly users: UsersService) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      secretOrKey: config.getOrThrow<string>('JWT_SECRET'),
+      secretOrKey   : config.getOrThrow<string>('JWT_SECRET'),
     })
   }
 

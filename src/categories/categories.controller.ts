@@ -3,7 +3,8 @@ import { CategoriesService } from './categories.service.js'
 
 @Controller('categories')
 export class CategoriesController {
-  constructor(private readonly categories: CategoriesService) {}
+  constructor(private readonly categories: CategoriesService) {
+  }
 
   @Get()
   findAll() {

@@ -1,22 +1,26 @@
-const VARIABLES = [
-  'PORT',
-  'NODE_ENV',
-  'SESSION_SECRET',
-  'GOOGLE_CLIENT_ID',
-  'GOOGLE_CLIENT_SECRET',
-  'GOOGLE_CALLBACK_URL',
-  'FRONTEND_URL',
-  'DB_HOST',
-  'DB_PORT',
-  'POSTGRES_USER',
-  'POSTGRES_PASSWORD',
-  'POSTGRES_DB',
-  'DB_MIN_POOL_SIZE',
-  'DB_MAX_POOL_SIZE',
-]
+import { object, string } from 'sito'
 
-VARIABLES.forEach(variable => {
-  if (!process.env[variable]) {
-    throw new Error(`[${variable}] environment variable is not specified`)
-  }
+const required = () => string().notEmpty().required()
+
+// Required env vars — startup throws if any is missing.
+const envSchema = object({
+  PORT          : required(),
+  NODE_ENV      : required(),
+  SESSION_SECRET: required(),
+  JWT_SECRET    : required(),
+
+  GOOGLE_CLIENT_ID    : required(),
+  GOOGLE_CLIENT_SECRET: required(),
+  GOOGLE_CALLBACK_URL : required(),
+  FRONTEND_URL        : required(),
+
+  DB_HOST          : required(),
+  DB_PORT          : required(),
+  POSTGRES_USER    : required(),
+  POSTGRES_PASSWORD: required(),
+  POSTGRES_DB      : required(),
+  DB_MIN_POOL_SIZE : required(),
+  DB_MAX_POOL_SIZE : required(),
 })
+
+await envSchema.assert(process.env)

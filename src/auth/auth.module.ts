@@ -9,19 +9,20 @@ import { AuthService } from './auth.service.js'
 import { AuthController } from './auth.controller.js'
 
 @Module({
-  imports: [
+  imports    : [
     UsersModule,
     PassportModule,
     JwtModule.registerAsync({
-      inject: [ConfigService],
+      inject    : [ConfigService],
       useFactory: (config: ConfigService) => ({
-        secret: config.getOrThrow<string>('JWT_SECRET'),
+        secret     : config.getOrThrow<string>('JWT_SECRET'),
         signOptions: { expiresIn: '1d' },
       }),
     }),
   ],
   controllers: [AuthController],
-  providers: [JwtStrategy, GoogleStrategy, AuthService],
-  exports: [AuthService],
+  providers  : [JwtStrategy, GoogleStrategy, AuthService],
+  exports    : [AuthService],
 })
-export class AuthModule {}
+export class AuthModule {
+}

@@ -1,19 +1,21 @@
-import { Injectable } from '@nestjs/common'
-import logger from '../../utils/logger.js'
+import { Injectable, LoggerService } from '@nestjs/common'
+import { getLogger } from '../../utils/logger.js'
 
-/**
- * Injectable wrapper around the existing request-scoped logger
- * (`utils/logger.ts`). It still reads the request id from AsyncLocalStorage,
- * so logs stay correlated. Future NestJS providers inject this instead of
- * importing the logger module directly.
- */
 @Injectable()
-export class AppLogger {
-  info(...args: unknown[]): void {
-    logger.info(...args)
+export class AppLogger implements LoggerService {
+  private get logger() {
+    return getLogger()
+  }
+
+  log(...args: any[]) {
+    this.logger.print('log', args)
+  }
+
+  warn(...args: any[]) {
+    this.logger.print('warn', args)
   }
 
   error(...args: unknown[]): void {
-    logger.error(...args)
+    this.logger.print('error', args)
   }
 }

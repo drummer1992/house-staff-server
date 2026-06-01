@@ -18,7 +18,7 @@ const runSql = async (knex: Knex, relativePath: string): Promise<void> => {
   await knex.raw(sql)
 }
 
-export const up = async function (knex: Knex): Promise<void> {
+export const up = async function(knex: Knex): Promise<void> {
   console.log('Creating initial tables')
 
   await runSql(knex, './init-db.sql')
@@ -43,17 +43,17 @@ export const up = async function (knex: Knex): Promise<void> {
   await knex.insert(productsWithIds.map(p => omit({
     ...p,
     releaseDate: new Date(p.releaseDate),
-    categoryId: categoriesMap[p.category].id,
-    imagesUrls: JSON.stringify(p.imagesUrls),
+    categoryId : categoriesMap[p.category].id,
+    imagesUrls : JSON.stringify(p.imagesUrls),
   }, ['category', 'collection']))).into('Products')
 
   await knex.insert(productsWithIds.map(p => ({
-    productId: p.id,
+    productId    : p.id,
     stockQuantity: 100,
   }))).into('ProductsInventory')
 
   await knex.insert(productsWithIds.filter(p => p.collection).map(p => ({
-    productId: p.id,
+    productId   : p.id,
     collectionId: collectionsMap[p.collection].id,
   }))).into('CollectionsProducts')
 
@@ -105,7 +105,7 @@ export const up = async function (knex: Knex): Promise<void> {
   console.log('Initial tables created')
 }
 
-export const down = async function (knex: Knex): Promise<void> {
+export const down = async function(knex: Knex): Promise<void> {
   console.log('Dropping initial tables')
 
   const filepath = path.resolve(__dirname, './drop-db.sql')
