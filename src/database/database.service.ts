@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common'
 import knex, { Knex } from 'knex'
+import { InjectPinoLogger, PinoLogger } from 'nestjs-pino'
 import { HOUR } from '../../utils/date.js'
 import * as timing from '../../utils/timing.js'
 import { randomCode } from '../../utils/random.js'
 import type { Timing } from '../../utils/timing.js'
 import pg from 'pg'
-import { AppLogger } from '../logger/app-logger.service.js'
 
 pg.types.setTypeParser(pg.types.builtins.INT8, (value: string) => {
   return parseInt(value)
@@ -30,7 +30,7 @@ interface QueryData {
 export class DatabaseService {
   public client: Knex
 
-  constructor(private readonly logger: AppLogger) {
+  constructor(@InjectPinoLogger('Database') private readonly logger: PinoLogger) {
     this.client = knex({
       client    : 'pg',
       connection: {
@@ -72,19 +72,22 @@ export class DatabaseService {
     queryData.options.timing = timing.init()
     queryData.options.id = randomCode(4)
 
-    this.logger.log(`${queryData.options.id} > SQL: ${sql.replace(/[\s\n]+/g, ' ')}`)
+    this.logger.debug({ queryId: queryData.options.id, sql: sql.replace(/[\s\n]+/g, ' ') }, 'sql')
   }
 
   private logQueryResponse(_response: unknown, queryData: QueryData): void {
     const ms = timing.getDiff(queryData.options.timing as Timing)
 
-    this.logger.log(`${queryData.options.id} < (${queryData.response?.rowCount}): ${ms.toFixed(3)}ms`)
+    this.logger.debug(
+      { queryId: queryData.options.id, rowCount: queryData.response?.rowCount, ms: Number(ms.toFixed(3)) },
+      'sql done',
+    )
   }
 
   private logQueryError(_err: unknown, queryData: QueryData): void {
     const ms = timing.getDiff(queryData.options.timing as Timing)
 
-    this.logger.error(`${queryData.options.id} < (err): ${ms.toFixed(3)}ms`)
+    this.logger.error({ queryId: queryData.options.id, ms: Number(ms.toFixed(3)) }, 'sql error')
   }
 
   escape = (value: unknown): unknown => {
