@@ -1,0 +1,35 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "lib": ["ES2022"],
+
+    "outDir": "./dist",
+    "rootDir": "./",
+
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+
+    "sourceMap": true,
+    "declaration": false,
+
+    "types": ["node"]
+  },
+  "include": [
+    "index.ts",
+    "knexfile.ts",
+    "types/**/*.ts",
+    "config/**/*.ts",
+    "constants/**/*.ts",
+    "db/**/*.ts",
+    "errors/**/*.ts",
+    "routes/**/*.ts",
+    "services/**/*.ts",
+    "utils/**/*.ts"
+  ],
+  "exclude": ["node_modules", "dist"]
+}

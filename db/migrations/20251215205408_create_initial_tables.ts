@@ -1,0 +1,118 @@
+import fs from 'fs/promises'
+import path from 'path'
+import keyBy from 'lodash.keyby'
+import omit from 'lodash.omit'
+import { fileURLToPath } from 'url'
+import type { Knex } from 'knex'
+
+import products from './products.json' with { type: 'json' }
+import { uuidV4 } from '../../utils/random.js'
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
+
+const runSql = async (knex: Knex, relativePath: string): Promise<void> => {
+  const filepath = path.resolve(__dirname, relativePath)
+
+  const sql = (await fs.readFile(filepath)).toString()
+
+  await knex.raw(sql)
+}
+
+export const up = async function (knex: Knex): Promise<void> {
+  console.log('Creating initial tables')
+
+  await runSql(knex, './init-db.sql')
+  await runSql(knex, './add-categories.sql')
+  await runSql(knex, './add-collections.sql')
+
+  const [categories, collections] = await Promise.all([
+    knex.select('*').from('Categories'),
+    knex.select('*').from('Collections'),
+  ])
+
+  const categoriesMap = keyBy(categories, 'name')
+  const collectionsMap = keyBy(collections, 'name')
+
+  const productsWithIds = (products as any[]).map(p => ({
+    ...p,
+    id: uuidV4(),
+  }))
+
+  const productsMap = keyBy(productsWithIds, 'name')
+
+  await knex.insert(productsWithIds.map(p => omit({
+    ...p,
+    releaseDate: new Date(p.releaseDate),
+    categoryId: categoriesMap[p.category].id,
+    imagesUrls: JSON.stringify(p.imagesUrls),
+  }, ['category', 'collection']))).into('Products')
+
+  await knex.insert(productsWithIds.map(p => ({
+    productId: p.id,
+    stockQuantity: 100,
+  }))).into('ProductsInventory')
+
+  await knex.insert(productsWithIds.filter(p => p.collection).map(p => ({
+    productId: p.id,
+    collectionId: collectionsMap[p.collection].id,
+  }))).into('CollectionsProducts')
+
+  const presentationsData: Record<string, unknown> = {
+    ['Living Room Collection']: {
+      imageUrl: 'https://i.ibb.co/YBXb75n9/living-room.webp',
+      hotspots: [
+        { top: '60%', left: '50%', productId: productsMap['Arm Chair'].id },
+        { top: '80%', left: '15%', productId: productsMap['Slipcovered Sofa'].id },
+        { top: '77%', left: '50%', productId: productsMap['Coffe Table'].id },
+      ],
+    },
+
+    ['Dining Room Collection']: {
+      imageUrl: 'https://i.ibb.co/9k92dK8X/dining-room.webp',
+      hotspots: [
+        { top: '70%', left: '35%', productId: productsMap['Salon Chair'].id },
+        { top: '73%', left: '20%', productId: productsMap['Dining Table'].id },
+      ],
+    },
+
+    ['Bedroom Collection']: {
+      imageUrl: 'https://i.ibb.co/KpS8nvk2/bedroom-collection.webp',
+      hotspots: [
+        { top: '38%', left: '42%', productId: productsMap['White Chair'].id },
+        { top: '62%', left: '15%', productId: productsMap['Bed'].id },
+        { top: '46%', left: '65%', productId: productsMap['Gravity Floor Lamp'].id },
+      ],
+    },
+
+    ['Home Collection']: {
+      imageUrl: 'https://i.ibb.co/G4MR0Tkw/home-collection.webp',
+      hotspots: [
+        { top: '64%', left: '42%', productId: productsMap['Barnen Dining Chair'].id },
+        { top: '89%', left: '20%', productId: productsMap['Arun Slipcovered Sofa'].id },
+        { top: '87%', left: '53%', productId: productsMap['Marble Coffee Table'].id },
+      ],
+    },
+  }
+
+  for (const collectionName in presentationsData) {
+    const presentation = presentationsData[collectionName]
+
+    await knex.update({ presentation: JSON.stringify(presentation) })
+      .where({ name: collectionName })
+      .from('Collections')
+  }
+
+  console.log('Initial tables created')
+}
+
+export const down = async function (knex: Knex): Promise<void> {
+  console.log('Dropping initial tables')
+
+  const filepath = path.resolve(__dirname, './drop-db.sql')
+
+  const sql = (await fs.readFile(filepath)).toString()
+
+  await knex.raw(sql)
+
+  console.log('Initial tables dropped')
+}
