@@ -1,10 +1,11 @@
 import { Body, Controller, Get, Put, UseGuards } from '@nestjs/common'
+import { plainToInstance } from 'class-transformer'
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js'
 import { User } from '../auth/decorators/user.decorator.js'
-import { JoiValidationPipe } from '../common/joi-validation.pipe.js'
 import { UsersService } from './users.service.js'
-import { updateUserSchema } from './users.schema.js'
-import type { User as DomainUser } from '../../types/domain.js'
+import { UpdateUserDto } from './dto/update-user.dto.js'
+import { UserResponseDto } from './dto/user-response.dto.js'
+import type { User as DomainUser } from '../types/domain.js'
 
 @Controller('user')
 @UseGuards(JwtAuthGuard)
@@ -13,15 +14,14 @@ export class UsersController {
   }
 
   @Get()
-  getProfile(@User() user: DomainUser) {
-    return user
+  getProfile(@User() user: DomainUser): UserResponseDto {
+    return plainToInstance(UserResponseDto, user, { excludeExtraneousValues: true })
   }
 
   @Put()
-  update(
-    @Body(new JoiValidationPipe(updateUserSchema)) changes: Partial<DomainUser>,
-    @User() user: DomainUser,
-  ) {
-    return this.users.update(changes, user)
+  async update(@Body() changes: UpdateUserDto, @User() user: DomainUser): Promise<UserResponseDto> {
+    const updated = await this.users.update(changes, user)
+
+    return plainToInstance(UserResponseDto, updated, { excludeExtraneousValues: true })
   }
 }

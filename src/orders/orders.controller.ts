@@ -1,10 +1,9 @@
 import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common'
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js'
 import { User } from '../auth/decorators/user.decorator.js'
-import { JoiValidationPipe } from '../common/joi-validation.pipe.js'
-import { OrdersService, type OrderInput } from './orders.service.js'
-import { createOrderSchema } from './orders.schema.js'
-import type { User as DomainUser } from '../../types/domain.js'
+import { OrdersService } from './orders.service.js'
+import { CreateOrderDto } from './dto/create-order.dto.js'
+import type { User as DomainUser } from '../types/domain.js'
 
 @Controller('orders')
 @UseGuards(JwtAuthGuard)
@@ -13,10 +12,7 @@ export class OrdersController {
   }
 
   @Post()
-  create(
-    @Body(new JoiValidationPipe(createOrderSchema)) order: OrderInput,
-    @User() user: DomainUser,
-  ) {
+  create(@Body() order: CreateOrderDto, @User() user: DomainUser) {
     return this.orders.create(order, user)
   }
 

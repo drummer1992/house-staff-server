@@ -24,11 +24,7 @@
   "include": [
     "knexfile.ts",
     "src/**/*.ts",
-    "types/**/*.ts",
-    "constants/**/*.ts",
-    "db/**/*.ts",
-    "errors/**/*.ts",
-    "utils/**/*.ts"
+    "db/**/*.ts"
   ],
   "exclude": [
     "node_modules",

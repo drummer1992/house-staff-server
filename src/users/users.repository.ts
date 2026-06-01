@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common'
-import type { User } from '../../types/domain.js'
+import type { User } from '../types/domain.js'
 import { DatabaseService } from '../database/database.service.js'
 
 @Injectable()

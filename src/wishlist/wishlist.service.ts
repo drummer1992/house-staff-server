@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common'
-import { validationAssert } from '../../errors/index.js'
-import { uuidV4 } from '../../utils/random.js'
+import { validationAssert } from '../common/asserts.js'
+import { randomUUID } from 'crypto'
 import { WishlistRepository } from './wishlist.repository.js'
-import type { User } from '../../types/domain.js'
+import type { User } from '../types/domain.js'
 
 @Injectable()
 export class WishlistService {
@@ -34,7 +34,7 @@ export class WishlistService {
       'Some products are already in the wishlist: ' + alreadyWishlisted.map(p => p.productId).join(', '))
 
     await this.wishlist.insertMany(productsIds.map(productId => ({
-      id    : uuidV4(),
+      id    : randomUUID(),
       userId: user.id,
       productId,
     })))

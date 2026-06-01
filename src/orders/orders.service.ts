@@ -1,39 +1,25 @@
 import { Injectable } from '@nestjs/common'
+import type { Knex } from 'knex'
 import keyBy from 'lodash.keyby'
 import groupBy from 'lodash.groupby'
 import sumBy from 'lodash.sumby'
-import { validationAssert } from '../../errors/index.js'
-import { uuidV4 } from '../../utils/random.js'
-import { roundMoney } from '../../utils/number.js'
-import deliveryMethods from '../../constants/delivery-methods.js'
-import countries from '../../constants/countries.js'
+import { validationAssert } from '../common/asserts.js'
+import { randomUUID } from 'crypto'
+import { roundMoney } from '../utils/number.js'
+import deliveryMethods from '../constants/delivery-methods.js'
+import countries from '../constants/countries.js'
 import { OrdersRepository } from './orders.repository.js'
-import type { User } from '../../types/domain.js'
+import { CreateOrderDto } from './dto/create-order.dto.js'
+import type { User } from '../types/domain.js'
 
-export interface OrderItemInput {
-  product: { id: string }
-  quantity: number
-}
-
-export interface OrderInput {
-  delivery: { method: string }
-  payment: { method: string }
-  totalPrice: number
-  shippingDetails: {
-    address: { country: string; city: string; postalCode: string; street: string }
-    email: string
-    phone: string
-    notes?: string
-  }
-  items: OrderItemInput[]
-}
+type OrderItems = CreateOrderDto['items']
 
 @Injectable()
 export class OrdersService {
   constructor(private readonly orders: OrdersRepository) {
   }
 
-  async create(order: OrderInput, user: User) {
+  async create(order: CreateOrderDto, user: User) {
     const productsIds = order.items.map(i => i.product.id)
 
     const products = await this.orders.findProductsByIds(productsIds)
@@ -51,41 +37,43 @@ export class OrdersService {
       `Expected delivery price: ${deliveryPrice}, Expected VAT: ${vat}`,
     )
 
-    await this.updateStock(order.items)
+    const orderId = randomUUID()
 
-    const orderId = uuidV4()
+    await this.orders.transaction(async trx => {
+      await this.updateStock(order.items, trx)
 
-    await this.orders.insertOrder({
-      id                : orderId,
-      userId            : user.id,
-      createdAt         : new Date().toISOString(),
-      status            : 'pending',
-      notes             : order.shippingDetails.notes,
-      deliveryMethod    : order.delivery.method,
-      paymentMethod     : order.payment.method,
-      receiverAddress   : order.shippingDetails.address.street,
-      receiverCity      : order.shippingDetails.address.city,
-      receiverCountry   : order.shippingDetails.address.country,
-      receiverPostalCode: order.shippingDetails.address.postalCode,
-      receiverEmail     : order.shippingDetails.email,
-      receiverPhone     : order.shippingDetails.phone,
-      vat,
-      deliveryPrice,
-      totalPrice,
+      await this.orders.insertOrder({
+        id                : orderId,
+        userId            : user.id,
+        createdAt         : new Date().toISOString(),
+        status            : 'pending',
+        notes             : order.shippingDetails.notes,
+        deliveryMethod    : order.delivery.method,
+        paymentMethod     : order.payment.method,
+        receiverAddress   : order.shippingDetails.address.street,
+        receiverCity      : order.shippingDetails.address.city,
+        receiverCountry   : order.shippingDetails.address.country,
+        receiverPostalCode: order.shippingDetails.address.postalCode,
+        receiverEmail     : order.shippingDetails.email,
+        receiverPhone     : order.shippingDetails.phone,
+        vat,
+        deliveryPrice,
+        totalPrice,
+      }, trx)
+
+      await this.orders.insertOrderItems(order.items.map(i => {
+        const product = productsMap[i.product.id]
+
+        return {
+          id       : randomUUID(),
+          orderId,
+          productId: i.product.id,
+          quantity : i.quantity,
+          price    : product.price,
+          discount : product.discount,
+        }
+      }), trx)
     })
-
-    await this.orders.insertOrderItems(order.items.map(i => {
-      const product = productsMap[i.product.id]
-
-      return {
-        id       : uuidV4(),
-        orderId,
-        productId: i.product.id,
-        quantity : i.quantity,
-        price    : product.price,
-        discount : product.discount,
-      }
-    }))
 
     const [created] = await this.buildOrders(user, [orderId])
 
@@ -151,10 +139,10 @@ export class OrdersService {
     }))
   }
 
-  private async updateStock(items: OrderItemInput[]): Promise<void> {
+  private async updateStock(items: OrderItems, trx: Knex.Transaction): Promise<void> {
     const productsIds = items.map(i => i.product.id)
 
-    const availability = await this.orders.findInventoryByIds(productsIds)
+    const availability = await this.orders.findInventoryByIds(productsIds, trx)
     const availabilityMap = keyBy(availability, 'productId')
 
     for (const item of items) {
@@ -164,11 +152,11 @@ export class OrdersService {
 
       validationAssert(stockQuantity >= quantity, `Product ${id} does not have enough items in stock`)
 
-      await this.orders.decrementStock(id, quantity)
+      await this.orders.decrementStock(id, quantity, trx)
     }
   }
 
-  private calculatePrice(productsMap: Record<string, any>, order: OrderInput) {
+  private calculatePrice(productsMap: Record<string, any>, order: CreateOrderDto) {
     const deliveryMethodsMap = keyBy(deliveryMethods, 'id')
 
     const productsPrice = sumBy(order.items, i => {

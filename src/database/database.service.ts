@@ -1,11 +1,11 @@
-import { Injectable } from '@nestjs/common'
+import { Injectable, type OnModuleDestroy } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import knex, { Knex } from 'knex'
 import { InjectPinoLogger, PinoLogger } from 'nestjs-pino'
 import { buildKnexConfig } from '../../db/knex-config.js'
-import * as timing from '../../utils/timing.js'
-import { randomCode } from '../../utils/random.js'
-import type { Timing } from '../../utils/timing.js'
+import * as timing from '../utils/timing.js'
+import { randomCode } from '../utils/random.js'
+import type { Timing } from '../utils/timing.js'
 import pg from 'pg'
 
 pg.types.setTypeParser(pg.types.builtins.INT8, (value: string) => {
@@ -28,7 +28,7 @@ interface QueryData {
 }
 
 @Injectable()
-export class DatabaseService {
+export class DatabaseService implements OnModuleDestroy {
   public client: Knex
 
   constructor(
@@ -76,11 +76,7 @@ export class DatabaseService {
     this.logger.error({ queryId: queryData.options.id, ms: Number(ms.toFixed(3)) }, 'sql error')
   }
 
-  escape = (value: unknown): unknown => {
-    if (typeof value === 'string') {
-      return value.replace(/'/g, '\'\'')
-    }
-
-    return value
+  onModuleDestroy(): Promise<void> {
+    return this.client.destroy()
   }
 }

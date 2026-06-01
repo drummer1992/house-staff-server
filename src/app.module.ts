@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common'
-import { APP_FILTER } from '@nestjs/core'
 import { LoggerModule } from 'nestjs-pino'
 import { loggerConfig } from './logger/logger.config.js'
 import { AppConfigModule } from './config/config.module.js'
@@ -13,7 +12,6 @@ import { UsersModule } from './users/users.module.js'
 import { WishlistModule } from './wishlist/wishlist.module.js'
 import { OrdersModule } from './orders/orders.module.js'
 import { HealthModule } from './health/health.module.js'
-import { ApiErrorFilter } from './common/api-error.filter.js'
 import { ConfigService } from '@nestjs/config'
 
 @Module({
@@ -36,9 +34,6 @@ import { ConfigService } from '@nestjs/config'
     WishlistModule,
     OrdersModule,
     HealthModule,
-  ],
-  providers: [
-    { provide: APP_FILTER, useClass: ApiErrorFilter },
   ],
 })
 export class AppModule {

@@ -1,5 +1,5 @@
 import type { Params } from 'nestjs-pino'
-import { randomCode } from '../../utils/random.js'
+import { randomCode } from '../utils/random.js'
 
 export const loggerConfig = (env?: string, logLevel?: string): Params => {
   const isProd = env === 'production'

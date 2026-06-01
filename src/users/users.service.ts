@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common'
 import compact from 'lodash.compact'
 import type { Profile } from 'passport-google-oauth20'
 import { UsersRepository } from './users.repository.js'
-import type { User } from '../../types/domain.js'
+import type { User } from '../types/domain.js'
 
 @Injectable()
 export class UsersService {

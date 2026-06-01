@@ -6,7 +6,7 @@ import { fileURLToPath } from 'url'
 import type { Knex } from 'knex'
 
 import products from './products.json' with { type: 'json' }
-import { uuidV4 } from '../../utils/random.js'
+import { randomUUID } from 'crypto'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -35,7 +35,7 @@ export const up = async function(knex: Knex): Promise<void> {
 
   const productsWithIds = (products as any[]).map(p => ({
     ...p,
-    id: uuidV4(),
+    id: randomUUID(),
   }))
 
   const productsMap = keyBy(productsWithIds, 'name')

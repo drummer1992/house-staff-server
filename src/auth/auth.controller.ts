@@ -4,7 +4,7 @@ import { ConfigService } from '@nestjs/config'
 import { GoogleOAuthGuard } from './guards/google-oauth.guard.js'
 import { User } from './decorators/user.decorator.js'
 import { AuthService } from './auth.service.js'
-import type { User as DomainUser } from '../../types/domain.js'
+import type { User as DomainUser } from '../types/domain.js'
 
 @Controller('auth')
 export class AuthController {

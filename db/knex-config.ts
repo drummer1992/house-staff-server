@@ -1,5 +1,6 @@
 import type { Knex } from 'knex'
-import { HOUR } from '../utils/date.js'
+
+const EIGHT_HOURS_MS = 8 * 60 * 60 * 1000
 
 type Getter = (key: string) => string | undefined
 
@@ -29,7 +30,7 @@ export const buildKnexConfig = (get: Getter): Knex.Config => {
     pool      : {
       min              : Number(_req('DB_MIN_POOL_SIZE')),
       max              : Number(_req('DB_MAX_POOL_SIZE')),
-      idleTimeoutMillis: 8 * HOUR,
+      idleTimeoutMillis: EIGHT_HOURS_MS,
     },
   }
 }
