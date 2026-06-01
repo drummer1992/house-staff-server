@@ -25,13 +25,11 @@
   "include": [
     "knexfile.ts",
     "src/**/*.ts",
-    "legacy/**/*.ts",
     "types/**/*.ts",
     "config/**/*.ts",
     "constants/**/*.ts",
     "db/**/*.ts",
     "errors/**/*.ts",
-    "routes/**/*.ts",
     "services/**/*.ts",
     "utils/**/*.ts"
   ],
