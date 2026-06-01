@@ -1,21 +1,12 @@
 import type { Knex } from 'knex'
+import dotenv from 'dotenv'
+import { buildKnexConfig } from './db/knex-config.js'
 
-await import('./config/init-env.js')
+dotenv.config()
 
 const config: Record<string, Knex.Config> = {
   development: {
-    client    : 'pg',
-    connection: {
-      host    : process.env.DB_HOST,
-      port    : Number(process.env.DB_PORT),
-      user    : process.env.POSTGRES_USER,
-      password: process.env.POSTGRES_PASSWORD,
-      database: process.env.POSTGRES_DB,
-
-      ssl: process.env.DB_HOST === 'postgres'
-        ? false
-        : { rejectUnauthorized: false },
-    },
+    ...buildKnexConfig(key => process.env[key]),
 
     migrations      : {
       tableName     : 'knex_migrations',

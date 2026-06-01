@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
 import knex, { Knex } from 'knex'
 import { InjectPinoLogger, PinoLogger } from 'nestjs-pino'
-import { HOUR } from '../../utils/date.js'
+import { buildKnexConfig } from '../../db/knex-config.js'
 import * as timing from '../../utils/timing.js'
 import { randomCode } from '../../utils/random.js'
 import type { Timing } from '../../utils/timing.js'
@@ -30,26 +31,11 @@ interface QueryData {
 export class DatabaseService {
   public client: Knex
 
-  constructor(@InjectPinoLogger('Database') private readonly logger: PinoLogger) {
-    this.client = knex({
-      client    : 'pg',
-      connection: {
-        host    : process.env.DB_HOST,
-        port    : Number(process.env.DB_PORT),
-        user    : process.env.POSTGRES_USER,
-        password: process.env.POSTGRES_PASSWORD,
-        database: process.env.POSTGRES_DB,
-
-        ssl: process.env.DB_HOST === 'postgres'
-          ? false
-          : { rejectUnauthorized: false },
-      },
-      pool      : {
-        min              : Number(process.env.DB_MIN_POOL_SIZE),
-        max              : Number(process.env.DB_MAX_POOL_SIZE),
-        idleTimeoutMillis: 8 * HOUR,
-      },
-    })
+  constructor(
+    @InjectPinoLogger('Database') private readonly logger: PinoLogger,
+    config: ConfigService,
+  ) {
+    this.client = knex(buildKnexConfig(key => config.get<string>(key)))
 
     this.client.on('query', queryData => this.logQuery(queryData))
     this.client.on('query-response', (response, queryData) => this.logQueryResponse(response, queryData))

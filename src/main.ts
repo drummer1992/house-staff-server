@@ -1,6 +1,4 @@
 import 'reflect-metadata'
-import '../config/init-env.js'
-import '../config/init-sito.js'
 import { NestFactory } from '@nestjs/core'
 import { NestExpressApplication } from '@nestjs/platform-express'
 import { Logger } from 'nestjs-pino'

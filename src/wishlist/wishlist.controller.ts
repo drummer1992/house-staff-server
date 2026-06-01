@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, Post, UseGuards } from '@nestjs/common'
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js'
 import { User } from '../auth/decorators/user.decorator.js'
-import { SitoValidationPipe } from '../common/sito-validation.pipe.js'
+import { JoiValidationPipe } from '../common/joi-validation.pipe.js'
 import { WishlistService } from './wishlist.service.js'
 import { addProductsSchema, removeProductSchema } from './wishlist.schema.js'
 import type { User as DomainUser } from '../../types/domain.js'
@@ -19,7 +19,7 @@ export class WishlistController {
 
   @Post('add-products')
   addProducts(
-    @Body(new SitoValidationPipe(addProductsSchema)) body: { productsIds: string[] },
+    @Body(new JoiValidationPipe(addProductsSchema)) body: { productsIds: string[] },
     @User() user: DomainUser,
   ) {
     return this.wishlist.addProducts(body.productsIds, user)
@@ -27,7 +27,7 @@ export class WishlistController {
 
   @Delete('remove-product')
   removeProduct(
-    @Body(new SitoValidationPipe(removeProductSchema)) body: { productId: string },
+    @Body(new JoiValidationPipe(removeProductSchema)) body: { productId: string },
     @User() user: DomainUser,
   ) {
     return this.wishlist.removeProduct(body.productId, user)

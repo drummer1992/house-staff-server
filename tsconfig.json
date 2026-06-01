@@ -25,11 +25,9 @@
     "knexfile.ts",
     "src/**/*.ts",
     "types/**/*.ts",
-    "config/**/*.ts",
     "constants/**/*.ts",
     "db/**/*.ts",
     "errors/**/*.ts",
-    "services/**/*.ts",
     "utils/**/*.ts"
   ],
   "exclude": [

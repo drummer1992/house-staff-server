@@ -1,35 +1,36 @@
-import { array, number, object, oneOf, string } from 'sito'
+import Joi from 'joi'
 import deliveryMethods from '../../constants/delivery-methods.js'
 import paymentMethods from '../../constants/payment-methods.js'
 import countries from '../../constants/countries.js'
 
-export const createOrderSchema = object({
-  delivery: object({ method: oneOf(deliveryMethods.map(m => m.id)).required() })
-    .strict().required(),
+export const createOrderSchema = Joi.object({
+  delivery: Joi.object({
+    method: Joi.string().valid(...deliveryMethods.map(m => m.id)).required(),
+  }).required(),
 
-  payment: object({ method: oneOf(paymentMethods.map(m => m.id)).required() })
-    .strict().required(),
+  payment: Joi.object({
+    method: Joi.string().valid(...paymentMethods.map(m => m.id)).required(),
+  }).required(),
 
-  totalPrice: number().positive(),
+  totalPrice: Joi.number().positive(),
 
-  shippingDetails: object({
-    address: object({
-      country   : oneOf(countries.map(c => c.name)),
-      city      : string().notEmpty().required(),
-      postalCode: string().notEmpty().required(),
-      street    : string().notEmpty().required(),
-    }).required().strict(),
+  shippingDetails: Joi.object({
+    address: Joi.object({
+      country   : Joi.string().valid(...countries.map(c => c.name)),
+      city      : Joi.string().min(1).required(),
+      postalCode: Joi.string().min(1).required(),
+      street    : Joi.string().min(1).required(),
+    }).required(),
 
-    email: string().notEmpty().required(),
-    phone: string().notEmpty().required(),
-    notes: string().notEmpty(),
-  }).required().strict(),
+    email: Joi.string().min(1).required(),
+    phone: Joi.string().min(1).required(),
+    notes: Joi.string().min(1),
+  }).required(),
 
-  items: array(
-    object({
-      product : object({ id: string().notEmpty().required() }).strict().required(),
-      quantity: number().positive(),
-    }).strict().required(),
-  )
-    .notEmpty().required(),
-}).required().strict()
+  items: Joi.array().items(
+    Joi.object({
+      product : Joi.object({ id: Joi.string().min(1).required() }).required(),
+      quantity: Joi.number().positive(),
+    }).required(),
+  ).min(1).required(),
+}).required()
