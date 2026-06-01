@@ -14,14 +14,18 @@
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
 
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+
     "sourceMap": true,
     "declaration": false,
 
     "types": ["node"]
   },
   "include": [
-    "index.ts",
     "knexfile.ts",
+    "src/**/*.ts",
+    "legacy/**/*.ts",
     "types/**/*.ts",
     "config/**/*.ts",
     "constants/**/*.ts",

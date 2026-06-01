@@ -33,4 +33,4 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=15s \
 EXPOSE 3000
 USER nodejs
 ENTRYPOINT ["node"]
-CMD ["dist/index.js"]
+CMD ["dist/src/main.js"]

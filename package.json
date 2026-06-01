@@ -1,12 +1,12 @@
 {
   "name": "house-staff-server",
   "version": "1.0.0",
-  "main": "dist/index.js",
+  "main": "dist/src/main.js",
   "type": "module",
   "scripts": {
     "build": "tsc",
-    "start": "node dist/index.js",
-    "dev": "npm run db:init && tsx watch index.ts",
+    "start": "node dist/src/main.js",
+    "dev": "npm run db:init && npm run build && concurrently -k \"tsc -w --preserveWatchOutput\" \"node --watch dist/src/main.js\"",
     "typecheck": "tsc --noEmit",
     "test": "echo \"Error: no test specified\" && exit 1",
     "db:init": "tsx node_modules/knex/bin/cli.js migrate:latest --knexfile knexfile.ts",
@@ -25,12 +25,19 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@nestjs/common": "^11.1.24",
+    "@nestjs/config": "^4.0.4",
+    "@nestjs/core": "^11.1.24",
+    "@nestjs/jwt": "^11.0.2",
+    "@nestjs/passport": "^11.0.5",
+    "@nestjs/platform-express": "^11.1.24",
     "axios": "^1.6.0",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
     "express-async-errors": "^3.1.1",
     "express-session": "^1.18.2",
+    "joi": "^18.2.1",
     "jsonwebtoken": "^9.0.3",
     "knex": "^3.1.0",
     "lodash.compact": "^3.0.1",
@@ -44,6 +51,8 @@
     "passport-google-oauth20": "^2.0.0",
     "passport-jwt": "^4.0.1",
     "pg": "^8.16.3",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.2",
     "sito": "^1.5.2"
   },
   "devDependencies": {
@@ -63,6 +72,7 @@
     "@types/passport-google-oauth20": "^2.0.17",
     "@types/passport-jwt": "^4.0.1",
     "@types/pg": "^8.20.0",
+    "concurrently": "^10.0.1",
     "tsx": "^4.22.4",
     "typescript": "^6.0.3"
   }
