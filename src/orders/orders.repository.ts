@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common'
+import { Injectable } from '@nestjs/common'
 import type { Knex } from 'knex'
 import { DatabaseService } from '../database/database.service.js'
 
