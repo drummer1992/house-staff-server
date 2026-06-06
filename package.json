@@ -10,6 +10,7 @@
     "typecheck": "tsc --noEmit",
     "test": "echo \"Error: no test specified\" && exit 1",
     "db:init": "tsx node_modules/knex/bin/cli.js migrate:latest --knexfile knexfile.ts",
+    "db:init:prod": "node node_modules/knex/bin/cli.js migrate:latest --knexfile dist/knexfile.js",
     "db:down": "tsx node_modules/knex/bin/cli.js migrate:down --knexfile knexfile.ts",
     "docker:run-staging": "docker run --env-file .env --name hss -p 3000:3000 -v $(pwd):/app -v /app/node_modules house-staff-server:$(git rev-parse --short HEAD)",
     "docker:build-staging": "docker build --target=dev -t house-staff-server:$(git rev-parse --short HEAD) -t house-staff-server:latest .",
