@@ -8,6 +8,7 @@ RUN npm ci
 # Stage 2 dev
 FROM base as dev
 COPY . .
+RUN mkdir -p /app/dist && chown -R node:node /app
 EXPOSE 3000
 USER node
 CMD [ "npm", "run", "dev" ]
@@ -32,5 +33,5 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=15s \
   CMD wget -qO- http://localhost:3000/health || exit 1
 EXPOSE 3000
 USER nodejs
-ENTRYPOINT ["node"]
+ENTRYPOINT ["node", "--import", "./dist/src/telemetry.js"]
 CMD ["dist/src/main.js"]

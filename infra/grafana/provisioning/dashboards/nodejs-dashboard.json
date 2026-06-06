@@ -1,0 +1,260 @@
+{
+  "title": "NestJs App Dashboard",
+  "editable": true,
+  "refresh": "5s",
+  "time": { "from": "now-5m", "to": "now" },
+  "tags": [],
+  "templating": {
+    "list": [
+      {
+        "name": "instance",
+        "label": "instance",
+        "type": "query",
+        "datasource": { "type": "prometheus", "uid": "prometheus" },
+        "definition": "label_values(http_server_duration_milliseconds_count,instance)",
+        "query": "label_values(http_server_duration_milliseconds_count,instance)",
+        "refresh": 1,
+        "includeAll": true,
+        "multi": true,
+        "current": { "text": "All", "value": "$__all" }
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 3,
+      "title": "Service Uptime",
+      "type": "gauge",
+      "gridPos": { "x": 0, "y": 0, "w": 5, "h": 8 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "dark-red", "value": 0 },
+              { "color": "dark-orange", "value": 50 },
+              { "color": "dark-yellow", "value": 100 },
+              { "color": "green", "value": 120 }
+            ]
+          }
+        }
+      },
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "orientation": "auto",
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true
+      },
+      "targets": [
+        {
+          "expr": "nodejs_eventloop_time_seconds_total{instance=~\"$instance\"}",
+          "legendFormat": "Uptime",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Memory Usage (MB)",
+      "type": "timeseries",
+      "gridPos": { "x": 5, "y": 0, "w": 19, "h": 8 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "drawStyle": "line", "lineWidth": 1, "fillOpacity": 0 }
+        }
+      },
+      "targets": [
+        {
+          "expr": "v8js_memory_heap_used_bytes{instance=~\"$instance\"} / 1024 / 1024",
+          "legendFormat": "Memory usage",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "title": "Error Rate",
+      "type": "timeseries",
+      "gridPos": { "x": 0, "y": 8, "w": 12, "h": 8 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "drawStyle": "line", "lineWidth": 1, "fillOpacity": 0 }
+        }
+      },
+      "targets": [
+        {
+          "expr": "sum by (http_method, http_route) (rate(http_server_duration_milliseconds_count{http_status_code=~\"5..\",instance=~\"$instance\"}[2m]))",
+          "legendFormat": "__auto",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 1,
+      "title": "CPU Usage (%)",
+      "type": "timeseries",
+      "transparent": true,
+      "gridPos": { "x": 12, "y": 8, "w": 12, "h": 8 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 2,
+            "fillOpacity": 4,
+            "axisSoftMax": 100,
+            "axisSoftMin": 5
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "rate(nodejs_eventloop_time_seconds_total{instance=~\"$instance\"}[2m]) * 100",
+          "legendFormat": "Cpu usage %",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "title": "Latency Percentiles (ms)",
+      "type": "timeseries",
+      "gridPos": { "x": 0, "y": 16, "w": 24, "h": 8 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms",
+          "color": { "mode": "palette-classic" },
+          "custom": { "drawStyle": "line", "lineWidth": 1, "fillOpacity": 0 }
+        }
+      },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.90, sum by (http_method, http_route, le) (rate(http_server_duration_milliseconds_bucket{instance=~\"$instance\"}[2m])))",
+          "legendFormat": "p90 {{http_method}} {{http_route}}",
+          "refId": "A"
+        },
+        {
+          "expr": "histogram_quantile(0.95, sum by (http_method, http_route, le) (rate(http_server_duration_milliseconds_bucket{instance=~\"$instance\"}[2m])))",
+          "legendFormat": "p95 {{http_method}} {{http_route}}",
+          "refId": "B"
+        },
+        {
+          "expr": "histogram_quantile(0.99, sum by (http_method, http_route, le) (rate(http_server_duration_milliseconds_bucket{instance=~\"$instance\"}[2m])))",
+          "legendFormat": "p99 {{http_method}} {{http_route}}",
+          "refId": "C"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Event Loop Lag (ms)",
+      "type": "timeseries",
+      "gridPos": { "x": 12, "y": 24, "w": 12, "h": 8 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 0,
+            "axisSoftMax": 50,
+            "axisSoftMin": 10
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "nodejs_eventloop_delay_p99_seconds{instance=~\"$instance\"} * 1000",
+          "legendFormat": "Event Loop Lag p99",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "title": "Routes (req/s)",
+      "type": "timeseries",
+      "gridPos": { "x": 0, "y": 32, "w": 12, "h": 8 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "drawStyle": "line", "lineWidth": 1, "fillOpacity": 0 }
+        }
+      },
+      "targets": [
+        {
+          "expr": "sum by (http_method, http_route) (rate(http_server_duration_milliseconds_count{instance=~\"$instance\"}[2m]))",
+          "legendFormat": "{{http_method}} {{http_route}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "Heap Memory (Used vs Limit MB)",
+      "type": "timeseries",
+      "transparent": true,
+      "gridPos": { "x": 12, "y": 32, "w": 12, "h": 8 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "drawStyle": "line", "lineWidth": 1, "fillOpacity": 0 }
+        }
+      },
+      "targets": [
+        {
+          "expr": "v8js_memory_heap_used_bytes{instance=~\"$instance\"} / 1024 / 1024",
+          "legendFormat": "Heap Used",
+          "refId": "A"
+        },
+        {
+          "expr": "v8js_memory_heap_limit_bytes{instance=~\"$instance\"} / 1024 / 1024",
+          "legendFormat": "Heap Limit",
+          "refId": "B"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "title": "Event Loop Utilization (0-1)",
+      "type": "timeseries",
+      "gridPos": { "x": 0, "y": 40, "w": 12, "h": 8 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "drawStyle": "line", "lineWidth": 1, "fillOpacity": 0 }
+        }
+      },
+      "targets": [
+        {
+          "expr": "nodejs_eventloop_utilization_ratio{instance=~\"$instance\"}",
+          "legendFormat": "Event Loop Utilization",
+          "refId": "A"
+        }
+      ]
+    }
+  ],
+  "__inputs": [
+    {
+      "name": "DS_PROMETHEUS",
+      "label": "Prometheus",
+      "type": "datasource",
+      "pluginId": "prometheus"
+    }
+  ],
+  "__requires": [
+    { "type": "datasource", "id": "prometheus", "version": "1.0.0" }
+  ]
+}

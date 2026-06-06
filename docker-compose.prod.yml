@@ -1,6 +1,45 @@
 version: '3.9'
 
 services:
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3001:3000"
+    volumes:
+      - ./infra/grafana/provisioning:/etc/grafana/provisioning
+
+  prometheus:
+    image: prom/prometheus:latest
+    command: [ "--config.file=/etc/prometheus/prometheus.yaml" ]
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./infra/prometheus/config.yaml:/etc/prometheus/prometheus.yaml
+
+  tempo:
+    image: grafana/tempo:latest
+    command: [ "-config.file=/etc/tempo.yaml" ]
+    ports:
+      - "3200:3200"
+    volumes:
+      - ./infra/tempo/config.yaml:/etc/tempo.yaml
+
+  loki:
+    image: grafana/loki:latest
+    command: -config.file=/etc/loki/local-config.yaml
+    ports:
+      - "3100:3100"
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:latest
+    command: [ "--config=/etc/otel-collector.yaml" ]
+    ports:
+      - "4317:4317"
+      - "4318:4318"
+      - "8889:8889"
+    volumes:
+      - ./infra/otel-collector/config.yaml:/etc/otel-collector.yaml
+
   app:
     build:
       context: .
@@ -10,6 +49,8 @@ services:
       - "3000:3000"
     env_file: .env.prod
     depends_on:
+      otel-collector:
+        condition: service_started
       postgres:
         condition: service_healthy
     restart: unless-stopped

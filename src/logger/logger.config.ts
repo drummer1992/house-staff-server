@@ -1,5 +1,6 @@
 import type { Params } from 'nestjs-pino'
 import { randomCode } from '../utils/random.js'
+import { trace } from '@opentelemetry/api'
 
 export const loggerConfig = (env?: string, logLevel?: string): Params => {
   const isProd = env === 'production'
@@ -9,7 +10,11 @@ export const loggerConfig = (env?: string, logLevel?: string): Params => {
       level: logLevel ?? (isProd ? 'info' : 'debug'),
 
       genReqId: (req, res) => {
-        const id = randomCode(4)
+        const span = trace.getActiveSpan()
+
+        const traceId = span?.spanContext().traceId
+
+        const id = traceId ?? randomCode(4)
 
         res.setHeader('x-request-id', id)
 
