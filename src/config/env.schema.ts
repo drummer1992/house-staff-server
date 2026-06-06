@@ -1,10 +1,9 @@
 import Joi from 'joi'
 
 export const envSchema = Joi.object({
-  PORT          : Joi.number().required(),
-  NODE_ENV      : Joi.string().required(),
-  SESSION_SECRET: Joi.string().required(),
-  JWT_SECRET    : Joi.string().required(),
+  PORT      : Joi.number().required(),
+  NODE_ENV  : Joi.string().required(),
+  JWT_SECRET: Joi.string().required(),
 
   GOOGLE_CLIENT_ID    : Joi.string().required(),
   GOOGLE_CLIENT_SECRET: Joi.string().required(),
