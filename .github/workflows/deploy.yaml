@@ -33,4 +33,4 @@ jobs:
             EOF
             cd house-staff-server
             git pull origin main
-            docker compose -f docker-compose.prod.yml up -d --build app
+            docker-compose -f docker-compose.prod.yml up -d --build app
