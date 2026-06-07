@@ -4,6 +4,7 @@ on:
     branches: [ main ]
 jobs:
   release:
+    environment: prod
     runs-on: ubuntu-latest
     steps:
       - name: Deploy to EC2
