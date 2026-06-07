@@ -18,6 +18,7 @@ CMD [ "npm", "run", "dev" ]
 FROM base as build
 COPY . .
 RUN npm run build
+RUN cp -r db/migrations dist/db/migrations
 
 
 # Stage 4 prod
@@ -28,10 +29,10 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm ci --omit=dev
 COPY --from=build /app/dist ./dist
-RUN chown -R nodejs:nodejs /app
+COPY entrypoint.sh ./entrypoint.sh
+RUN chmod +x entrypoint.sh && chown -R nodejs:nodejs /app
 HEALTHCHECK --interval=30s --timeout=5s --start-period=15s \
   CMD wget -qO- http://localhost:3000/health || exit 1
 EXPOSE 3000
 USER nodejs
-ENTRYPOINT ["node", "--import", "./dist/src/telemetry.js"]
-CMD ["dist/src/main.js"]
+ENTRYPOINT ["sh", "entrypoint.sh"]
