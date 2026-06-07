@@ -18,7 +18,7 @@ CMD [ "npm", "run", "dev" ]
 FROM base as build
 COPY . .
 RUN npm run build
-RUN cp -r db/migrations dist/db/migrations
+RUN cp db/migrations/*.sql db/migrations/*.json dist/db/migrations/
 
 
 # Stage 4 prod
