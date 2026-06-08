@@ -43,11 +43,15 @@ services:
   app:
     build:
       context: .
-      target: prod
+      target: dev
     image: house-staff:${IMAGE_TAG:-latest}
     ports:
       - "3000:3000"
-    env_file: .env.prod
+    env_file: .env.dev
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/dist
     depends_on:
       otel-collector:
         condition: service_started
@@ -57,7 +61,7 @@ services:
 
   postgres:
     image: postgres:15-alpine
-    env_file: .env.prod
+    env_file: .env.dev
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
