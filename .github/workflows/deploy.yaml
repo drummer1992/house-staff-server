@@ -7,30 +7,32 @@ jobs:
     environment: prod
     runs-on: ubuntu-latest
     steps:
-      - name: Deploy to EC2
-        uses: appleboy/ssh-action@v1
+      - uses: actions/checkout@v6
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v6
         with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.EC2_KEY }}
-          script: |
-            cat > ~/house-staff-server/.env.prod << 'EOF'
-            PORT=${{ vars.PORT }}
-            NODE_ENV=${{ vars.NODE_ENV }}
-            JWT_SECRET=${{ secrets.JWT_SECRET }}
-            GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
-            GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}
-            GOOGLE_CALLBACK_URL=${{ vars.GOOGLE_CALLBACK_URL }}
-            FRONTEND_URL=${{ vars.FRONTEND_URL }}
-            DB_HOST=${{ secrets.DB_HOST }}
-            DB_PORT=${{ secrets.DB_PORT }}
-            POSTGRES_USER=${{ secrets.POSTGRES_USER }}
-            POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
-            POSTGRES_DB=${{ secrets.POSTGRES_DB }}
-            DB_MIN_POOL_SIZE=${{ vars.DB_MIN_POOL_SIZE }}
-            DB_MAX_POOL_SIZE=${{ vars.DB_MAX_POOL_SIZE }}
-            OTEL_EXPORTER_OTLP_ENDPOINT=${{ secrets.OTEL_EXPORTER_OTLP_ENDPOINT }}
-            EOF
-            cd house-staff-server
-            git pull origin main
-            docker-compose -f docker-compose.prod.yml up -d --build app
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Login to AWS ECR
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and push image to AWS ECR
+        env:
+          ECR_REGISTRY: ${{ vars.AWS_ACCOUNT_ID }}.dkr.ecr.eu-central-1.amazonaws.com
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build --platform linux/amd64 --target=prod \
+            -t $ECR_REGISTRY/${{ vars.AWS_REPOSITORY }}:latest \
+            -t $ECR_REGISTRY/${{ vars.AWS_REPOSITORY }}:$IMAGE_TAG .
+          docker push $ECR_REGISTRY/${{ vars.AWS_REPOSITORY }}:latest
+          docker push $ECR_REGISTRY/${{ vars.AWS_REPOSITORY }}:$IMAGE_TAG
+
+      - name: Update AWS ECS service
+        run: |
+          aws ecs update-service \
+              --cluster ${{ vars.AWS_CLUSTER }} \
+              --service ${{ vars.AWS_SERVICE }} \
+              --force-new-deployment
